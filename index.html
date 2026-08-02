@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xos geldin Balaam 🎀</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #ffe6f2;
+      background-image: radial-gradient(#ffb6c1 15%, transparent 16%), radial-gradient(#ffb6c1 15%, transparent 16%);
+      background-size: 60px 60px;
+      background-position: 0 0, 30px 30px;
+      font-family: 'Fredoka', cursive, sans-serif;
+      min-height: 100vh;
+      color: #ff3385;
+      overflow-x: hidden;
+      transition: background 0.5s ease;
+      position: relative;
+    }
+
+    body.full-pink {
+      background-color: #ff66b2 !important;
+      background-image: none !important;
+    }
+
+    /* FALLING ELEMENTS CONTAINER */
+    .falling-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+      overflow: hidden;
+    }
+
+    .falling-item {
+      position: absolute;
+      top: -50px;
+      user-select: none;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(105vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* TOP RIGHT SECRET VAULT */
+    .vault-container {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 50;
+    }
+
+    .vault-hint {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ff0066;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 2px solid #ff66b2;
+      box-shadow: 0 4px 10px rgba(255, 102, 178, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .vault-widget {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px 15px;
+      border-radius: 25px;
+      border: 3px solid #ff66b2;
+      box-shadow: 0 5px 15px rgba(255, 102, 178, 0.3);
+    }
+
+    .vault-icon {
+      font-size: 1.4rem;
+    }
+
+    .vault-input {
+      width: 90px;
+      padding: 6px 10px;
+      border: 2px solid #ff99dd;
+      border-radius: 15px;
+      outline: none;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      color: #ff0066;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .vault-btn {
+      padding: 6px 12px;
+      background: #ff3399;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    /* VAULT GALLERY MODAL */
+    .vault-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .vault-modal.active {
+      display: flex;
+    }
+
+    .vault-card {
+      background: white;
+      padding: 25px;
+      border-radius: 30px;
+      border: 5px solid #ff66b2;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(255, 0, 102, 0.4);
+    }
+
+    .close-vault {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #ff0066;
+    }
+
+    .vault-title {
+      font-family: 'Pacifico', cursive;
+      color: #ff0066;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .photo-item {
+      width: 100%;
+      height: 130px;
+      border-radius: 15px;
+      object-fit: cover;
+      border: 3px solid #ffb3d9;
+    }
+
+    /* 1-CI EKRAN: AUTOMATIC WELCOME SCREEN (5 SEC) */
+    .welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #ffb3d9, #ff66b2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .welcome-screen.hidden {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .welcome-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 40px;
+      border: 5px solid #ff3399;
+      box-shadow: 0 15px 35px rgba(255, 0, 102, 0.3);
+      position: relative;
+      max-width: 90%;
+      width: 420px;
+    }
+
+    .welcome-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.8rem;
+      color: #ff0066;
+      text-shadow: 2px 2px #ffccd5;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+
+    .loading-text {
+      font-size: 1.1rem;
+      color: #ff3399;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    /* 2-CI EKRAN: MAIN SCREEN */
+    .main-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 35px;
+      border-radius: 30px;
+      border: 4px solid #ff66b2;
+      box-shadow: 0 10px 20px rgba(255, 102, 178, 0.3);
+      margin-top: 50px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .bow-left, .bow-right {
+      position: absolute;
+      top: -20px;
+      font-size: 40px;
+    }
+    .bow-left { left: -15px; transform: rotate(-20deg); }
+    .bow-right { right: -15px; transform: rotate(20deg); }
+
+    h2 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      color: #ff0066;
+    }
+
+    /* LOVE COUNTER & PROGRESS BAR BOX */
+    .counter-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 18px 25px;
+      border-radius: 30px;
+      border: 3px solid #ff66b2;
+      box-shadow: 0 8px 20px rgba(255, 102, 178, 0.2);
+      margin-bottom: 15px;
+      width: 350px;
+      max-width: 90%;
+    }
+
+    .counter-number {
+      font-size: 2.8rem;
+      font-weight: 600;
+      color: #ff0066;
+      text-shadow: 1px 1px #ffb3d9;
+      line-height: 1;
+    }
+
+    .counter-text {
+      font-size: 1.1rem;
+      color: #d6006e;
+      font-weight: 600;
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+
+    .progress-title {
+      font-size: 0.95rem;
+      color: #ff3399;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .progress-container {
+      background-color: #ffe6f2;
+      border-radius: 20px;
+      border: 2px solid #ff66b2;
+      height: 22px;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, #ff99dd, #ff0066);
+      height: 100%;
+      width: 0%;
+      border-radius: 20px;
+      transition: width 2s ease-out;
+    }
+
+    .progress-percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.8rem;
+      color: #ffffff;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+
+    /* WHEEL WRAPPER */
+    .wheel-wrapper {
+      position: relative;
+      margin: 10px 0;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 45px;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    #wheel {
+      border-radius: 50%;
+      border: 8px solid #ff66b2;
+      box-shadow: 0 8px 25px rgba(255, 51, 133, 0.4);
+      background-color: white;
+    }
+
+    .spin-btn, .love-btn {
+      margin-top: 15px;
+      padding: 15px 35px;
+      font-size: 1.3rem;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #ff66b2, #ff0066);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 0, 102, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .love-btn {
+      background: linear-gradient(135deg, #ff3399, #d6006e);
+      margin-top: 10px;
+    }
+
+    .spin-btn:hover, .love-btn:hover {
+      transform: scale(1.08);
+    }
+
+    .spin-btn:disabled {
+      background: #ffb3d9;
+      cursor: not-allowed;
+      transform: scale(1);
+    }
+
+    .result-box, .reason-box {
+      margin-top: 15px;
+      font-size: 1.4rem;
+      color: #d6005c;
+      min-height: 50px;
+      font-weight: 600;
+      background: white;
+      padding: 12px 25px;
+      border-radius: 20px;
+      border: 2px dashed #ff66b2;
+      display: inline-block;
+      max-width: 380px;
+    }
+
+    .reason-box {
+      display: inline-block;
+      margin-top: 10px;
+      background: #fff0f5;
+      border-color: #ff3399;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FALLING HEARTS, FLOWERS & RIBBONS CONTAINER -->
+  <div class="falling-container" id="fallingContainer"></div>
+
+  <!-- TOP RIGHT SECRET VAULT WIDGET WITH ARROW & HINT -->
+  <div class="vault-container">
+    <div class="vault-hint">
+      mama ucun sifreni tap ➡️
+    </div>
+    <div class="vault-widget">
+      <span class="vault-icon">🔒</span>
+      <input type="password" id="vaultPass" class="vault-input" placeholder="Sifre" maxlength="6">
+      <button class="vault-btn" onclick="checkVault()">Ac</button>
+    </div>
+  </div>
+
+  <!-- SECRET VAULT GALLERY MODAL -->
+  <div class="vault-modal" id="vaultModal">
+    <div class="vault-card">
+      <span class="close-vault" onclick="closeVault()">&times;</span>
+      <h3 class="vault-title">Gizli Sekiller 💖</h3>
+      <div class="photo-grid">
+        <img src="https://i.ibb.co/jPhjQMC3/Screenshot-2026-08-03-at-02-44-21.png" alt="Sekil 1" class="photo-item">
+        <img src="https://i.ibb.co/zW51m9S3/Screenshot-2026-08-03-at-02-44-57.png" alt="Sekil 2" class="photo-item">
+        <img src="https://i.ibb.co/rRwPwc0R/Screenshot-2026-07-25-at-02-17-35.png" alt="Sekil 3" class="photo-item">
+      </div>
+    </div>
+  </div>
+
+  <!-- 1-CI EKRAN: AUTOMATIC WELCOME SCREEN (5 SEC AUTO-CLOSE) -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-card">
+      <span class="bow-left">🎀</span>
+      <span class="bow-right">🎀</span>
+      <h1 class="welcome-title">XOSGELDIN BALAAMM 💖</h1>
+      <p class="loading-text">Gozle acilir... 🌸✨</p>
+    </div>
+  </div>
+
+  <!-- 2-CI EKRAN: WHEEL SCREEN & COUNTERS -->
+  <div class="main-screen">
+    <div class="header-container">
+      <span class="bow-left">🎀</span>
+      <span class="bow-right">🎀</span>
+      <h2>Gorey bugun basima ne gelecek 🌸</h2>
+    </div>
+
+    <!-- LOVE COUNTER & PROGRESS BAR -->
+    <div class="counter-card">
+      <div class="counter-number" id="dayCounter">0</div>
+      <div class="counter-text">139 gundu biryerdeyiy 💖</div>
+      
+      <div class="progress-title">Ilk date ucun yuklenir 139 / 200 gun 🌸</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-percentage" id="progressText">0%</div>
+      </div>
+    </div>
+
+    <!-- WHEEL -->
+    <div class="wheel-wrapper">
+      <div class="pointer">🎀</div>
+      <canvas id="wheel" width="350" height="350"></canvas>
+    </div>
+
+    <button class="spin-btn" id="spinBtn" onclick="spinWheel()">Carxi Cevir ✨</button>
+
+    <div class="result-box" id="resultText"></div>
+
+    <!-- SENI NIYE SEVIREM BUTTON & REASON BOX -->
+    <button class="love-btn" onclick="showLoveReason()">Seni niye sevirem 💖</button>
+    <div class="reason-box" id="reasonBox">bas gor hele niye sevirem</div>
+  </div>
+
+  <script>
+    // SECRET VAULT LOGIC
+    function checkVault() {
+      const pass = document.getElementById('vaultPass').value;
+      if (pass === "131626") {
+        document.getElementById('vaultModal').classList.add('active');
+        confetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { y: 0.3 }
+        });
+      } else {
+        alert("Sifre sehvdir!");
+      }
+    }
+
+    function closeVault() {
+      document.getElementById('vaultModal').classList.remove('active');
+    }
+
+    // CONTINUOUS FALLING HEARTS, FLOWERS & BOWS
+    const fallingContainer = document.getElementById('fallingContainer');
+    const items = ['🩷', '🌸', '🎀', '💖', '💕'];
+
+    function createFallingItem() {
+      const item = document.createElement('div');
+      item.classList.add('falling-item');
+      item.innerText = items[Math.floor(Math.random() * items.length)];
+      item.style.left = Math.random() * 100 + 'vw';
+      item.style.fontSize = (Math.random() * 20 + 15) + 'px';
+      
+      const duration = Math.random() * 3 + 4;
+      item.style.animationDuration = duration + 's';
+
+      fallingContainer.appendChild(item);
+
+      setTimeout(() => {
+        item.remove();
+      }, duration * 1000);
+    }
+
+    setInterval(createFallingItem, 300);
+
+    // 5 SANIE SORA OZ-OZUNE ACILIR
+    setTimeout(function() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      startCounterAnimation();
+    }, 5000);
+
+    function startCounterAnimation() {
+      const targetDays = 139;
+      const counterElement = document.getElementById('dayCounter');
+      let currentDay = 0;
+      const duration = 2000;
+      const stepTime = Math.abs(Math.floor(duration / targetDays));
+
+      const timer = setInterval(() => {
+        currentDay++;
+        counterElement.innerText = currentDay;
+        if (currentDay >= targetDays) {
+          clearInterval(timer);
+        }
+      }, stepTime);
+
+      const percentage = (139 / 200) * 100;
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      setTimeout(() => {
+        progressBar.style.width = percentage + '%';
+        progressText.innerText = percentage.toFixed(1) + '%';
+      }, 300);
+    }
+
+    // SENI NIYE SEVIREM REASONS
+    const loveReasons = [
+      "yaninda olanda hiss etdiyim o rahatliga gore",
+      "usaq kimi xirda seylere sevinmeyine gore",
+      "meni oldugum kimi qebul etmeyine gore",
+      "gulusunun dunyanin en sirin seyi olmasina gore",
+      "baxislarinda huzur tapdigima gore",
+      "her zaman yanımda mene destek olduguna gore",
+      "her gunumu daha gozel etdiyine gore"
+    ];
+
+    function showLoveReason() {
+      const reasonBox = document.getElementById('reasonBox');
+      const randomReason = loveReasons[Math.floor(Math.random() * loveReasons.length)];
+      reasonBox.innerText = randomReason;
+      
+      confetti({
+        particleCount: 40,
+        spread: 50,
+        origin: { y: 0.8 },
+        colors: ['#ff66b2', '#ff99dd', '#ffffff']
+      });
+    }
+
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const spinBtn = document.getElementById('spinBtn');
+    const resultText = document.getElementById('resultText');
+
+    const options = [
+      { text: "Sese Girmek 📞", color: "#ff99dd", message: "SESE GIRIRIY YEHUUU 🎉💖" },
+      { text: "Dalasmaq 🥊", color: "#ffccf2", message: "sen meni sevmirsen 🥺💔" },
+      { text: "Oyun Oynamaq 🎮", color: "#ffb3e6", message: "yene yerden pul yigirig beli 🤑💸" },
+      { text: "Sohbet Elemek 💬", color: "#ffa6e8", message: "he,he,he,he 😏💬" }
+    ];
+
+    const numOptions = options.length;
+    const arcSize = (2 * Math.PI) / numOptions;
+    let currentAngle = 0;
+    let spinCount = 0;
+
+    function drawWheel() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2 - 10;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < numOptions; i++) {
+        const startAngle = currentAngle + i * arcSize;
+        const endAngle = startAngle + arcSize;
+
+        ctx.beginPath();
+        ctx.fillStyle = options[i].color;
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#ffffff";
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#d6006e";
+        ctx.font = "bold 16px Fredoka";
+        ctx.fillText(options[i].text, radius - 20, 5);
+        ctx.restore();
+      }
+    }
+
+    drawWheel();
+
+    function spinWheel() {
+      spinBtn.disabled = true;
+      document.body.classList.remove('full-pink');
+      resultText.innerText = "Gorey ne gelecek?... 🤔✨";
+
+      spinCount++;
+
+      let selectedIndex;
+      
+      if (spinCount <= 3) {
+        selectedIndex = 0;
+      } else {
+        selectedIndex = Math.floor(Math.random() * options.length);
+      }
+
+      const targetSectorAngle = selectedIndex * arcSize + arcSize / 2;
+      const extraRounds = (Math.floor(Math.random() * 4) + 5) * 2 * Math.PI;
+      const targetAngle = extraRounds + (1.5 * Math.PI) - targetSectorAngle;
+
+      let start = null;
+      const duration = 4000;
+      const initialAngle = currentAngle % (2 * Math.PI);
+
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        const progress = (timestamp - start) / duration;
+
+        if (progress < 1) {
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          currentAngle = initialAngle + easeOut * (targetAngle - initialAngle);
+          drawWheel();
+          requestAnimationFrame(animate);
+        } else {
+          currentAngle = targetAngle;
+          drawWheel();
+          spinBtn.disabled = false;
+          
+          const winOption = options[selectedIndex];
+          resultText.innerHTML = `<b>${winOption.message}</b>`;
+
+          if (selectedIndex === 0) {
+            document.body.classList.add('full-pink');
+          }
+
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#ff66b2', '#ff99dd', '#ffffff', '#ff0066']
+          });
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+  </script>
+</body>
+</html>
